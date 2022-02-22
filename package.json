@@ -80,13 +80,13 @@
     ]
   },
   "dependencies": {
-    "@akashic/headless-driver": "^1.11.0",
+    "@akashic/headless-driver": "^1.11.31",
     "canvas": "2.9.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@akashic/eslint-config": "^1.0.0",
-    "@akashic/remark-preset-lint": "^0.1.1",
+    "@akashic/remark-preset-lint": "^0.1.2",
     "@types/jest": "^27.4.0",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.12.1",
