@@ -80,7 +80,7 @@
     ]
   },
   "dependencies": {
-    "@akashic/headless-driver": "^1.11.31",
+    "@akashic/headless-driver": "^1.11.33",
     "canvas": "2.9.0",
     "uuid": "^8.3.2"
   },
