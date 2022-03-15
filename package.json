@@ -85,7 +85,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@akashic/eslint-config": "^1.0.0",
+    "@akashic/eslint-config": "^1.1.0",
     "@akashic/remark-preset-lint": "^0.1.2",
     "@types/jest": "^27.4.1",
     "@types/uuid": "^8.3.4",
