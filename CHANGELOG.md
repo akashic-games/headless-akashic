@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.0.0
+* headless-driver@2.0.0 に追従
+
 ## 2.2.0
 * headless-driver@1.11.0 に追従
 

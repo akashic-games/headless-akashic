@@ -1,6 +1,6 @@
 {
   "name": "@akashic/headless-akashic",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "A headless module for launching contents with the Akashic Engine",
   "main": "lib/index.js",
   "scripts": {
