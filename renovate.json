@@ -1,34 +1,32 @@
 {
   "extends": [
-    "config:base"
+    "github>akashic-games/renovate-config",
+    "github>akashic-games/renovate-config:groupPatchMinor",
+    "github>akashic-games/renovate-config:bumpAkashicPatch"
   ],
-  "timezone": "Asia/Tokyo",
-  "schedule": [
-    "every weekend",
-    "after 10pm every weekday",
-    "before 6am every weekday"
-  ],
-  "labels": ["dependencies"],
-  "prConcurrentLimit": 0,
-  "prHourlyLimit": 0,
-  "separateMinorPatch": true,
-  "pin": false,
-  "rangeStrategy": "bump",
   "packageRules": [
     {
       "matchPackagePatterns": ["^@akashic/"],
-      "groupName": "all dependencies (akashic)",
-      "schedule": "at any time"
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
     },
     {
-      "matchUpdateTypes": ["minor"],
-      "excludePackagePatterns": ["^@akashic/"],
-      "groupName": "all dependencies"
+      "matchPackagePatterns": ["eslint"],
+      "groupName": "eslint packages"
+    },
+    {
+      "matchPackagePatterns": ["jest"],
+      "groupName": "jest packages"
     },
     {
       "matchUpdateTypes": ["patch"],
-      "excludePackagePatterns": ["^@akashic/"],
-      "groupName": "all dependencies"
+      "excludePackagePatterns": ["@akashic/", "eslint", "jest"],
+      "groupName": "patch dependencies"
+    },
+    {
+      "matchUpdateTypes": ["minor"],
+      "excludePackagePatterns": ["@akashic/", "eslint", "jest"],
+      "groupName": "minor dependencies"
     }
   ]
 }
