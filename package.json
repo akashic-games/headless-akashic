@@ -53,12 +53,11 @@
       "js"
     ],
     "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.jest.json"
-      }
+      "^.+\\.ts$":[
+        "ts-jest", {
+          "tsconfig": "tsconfig.jest.json"
+        }
+      ]
     },
     "testMatch": [
       "<rootDir>/src/**/*.spec.ts"
@@ -85,7 +84,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@akashic/eslint-config": "^1.1.0",
+    "@akashic/eslint-config": "^1.1.1",
     "@akashic/remark-preset-lint": "^0.1.2",
     "@types/jest": "^29.0.0",
     "@types/uuid": "^8.3.4",
