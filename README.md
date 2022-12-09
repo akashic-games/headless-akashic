@@ -69,7 +69,7 @@ const GameContext = require("@akashic/headless-akashic").GameContext;
 ### コンテンツの描画内容の取得
 
 akashic-engine@3.0.0 以降に対応したコンテンツであれば `GameClient#getPrimarySurfaceCanvas()` を利用して描画内容を取得できます。
-headless-akashic@2.0.0 時点では、[node-canvas][node-canvas] での描画出力のみをサポートしています。
+headless-akashic@3.1.0 時点では、[node-canvas][node-canvas] での描画出力のみをサポートしています。
 詳細な API 仕様については [こちら][node-canvas] を参照してください。
 
 以下はコンテンツの描画内容を png として保存する例です。
