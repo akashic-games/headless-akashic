@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.1.0
+* node-canvas を optionalDependencies へ移動
+
 ## 3.0.1
 * headless-driver@2.1.1 に追従
 
