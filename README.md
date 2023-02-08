@@ -66,6 +66,16 @@ const GameContext = require("@akashic/headless-akashic").GameContext;
 
 ## note
 
+### canvas の利用時の注意点
+
+canvas を利用し描画内容取得等を行う場合には、コンテンツ側で下記コマンドを実行し canvas をインストールしてください。
+
+```sh
+npm i -D canvas
+```
+
+canvas 動作時にライブラリが足りないなどのエラーが出た場合は、[node-canvas][node-canvas] の Compiling の箇所を参照し実行環境に適したライブラリをインストールしてください。
+
 ### コンテンツの描画内容の取得
 
 akashic-engine@3.0.0 以降に対応したコンテンツであれば `GameClient#getPrimarySurfaceCanvas()` を利用して描画内容を取得できます。

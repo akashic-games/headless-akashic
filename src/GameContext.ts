@@ -99,7 +99,9 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 		const game = (await runnerManager.startRunner(runnerId)) as EngineVersions[EngineVersion]["game"];
 		runner.pause();
 
-		return new GameClient<EngineVersion>({ runner, game, type: "active", renderingMode: params.renderingMode });
+		const gameClient = new GameClient<EngineVersion>({ runner, game, type: "active", renderingMode: params.renderingMode });
+		await gameClient.initialize();
+		return gameClient;
 	}
 
 	/**
@@ -131,7 +133,9 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 		runner.errorTrigger.add(this.handleRunnerError, this);
 		runner.pause();
 
-		return new GameClient<EngineVersion>({ runner, game, type: "passive", renderingMode: params.renderingMode });
+		const gameClient = new GameClient<EngineVersion>({ runner, game, type: "passive", renderingMode: params.renderingMode });
+		await gameClient.initialize();
+		return gameClient;
 	}
 
 	/**
