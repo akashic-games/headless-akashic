@@ -72,6 +72,14 @@ akashic-engine@3.0.0 以降に対応したコンテンツであれば `GameClien
 headless-akashic@3.1.0 時点では、[node-canvas][node-canvas] での描画出力のみをサポートしています。
 詳細な API 仕様については [こちら][node-canvas] を参照してください。
 
+canvas を利用し描画内容取得等を行う場合には、コンテンツ側で下記コマンドを実行し canvas をインストールしてください。
+
+```sh
+npm i -D canvas
+```
+
+canvas 利用時にライブラリが足りないなどのエラーが出た場合は、[node-canvasの Compiling](https://github.com/Automattic/node-canvas#compiling) を参照し実行環境に適したライブラリをインストールしてください。
+
 以下はコンテンツの描画内容を png として保存する例です。
 
 ```javascript
@@ -83,16 +91,6 @@ const client = await context.getGameClient({ renderingMode: "canvas" }); // rend
 const canvas = client.getPrimarySurfaceCanvas();
 fs.writeFileSync("output.png", canvas.toBuffer()); // "output.png" に描画内容を書き出し
 ```
-
-#### canvas の利用時の注意事項
-
-canvas を利用し描画内容取得等を行う場合には、コンテンツ側で下記コマンドを実行し canvas をインストールしてください。
-
-```sh
-npm i -D canvas
-```
-
-canvas 利用時にライブラリが足りないなどのエラーが出た場合は、[node-canvasの Compiling](https://github.com/Automattic/node-canvas#compiling) を参照し実行環境に適したライブラリをインストールしてください。
 
 ### 空のゲームコンテンツの仕様
 
