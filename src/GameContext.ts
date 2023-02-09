@@ -99,9 +99,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 		const game = (await runnerManager.startRunner(runnerId)) as EngineVersions[EngineVersion]["game"];
 		runner.pause();
 
-		const gameClient = new GameClient<EngineVersion>({ runner, game, type: "active", renderingMode: params.renderingMode });
-		await gameClient.initialize();
-		return gameClient;
+		return new GameClient<EngineVersion>({ runner, game, type: "active", renderingMode: params.renderingMode });
 	}
 
 	/**
@@ -133,9 +131,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 		runner.errorTrigger.add(this.handleRunnerError, this);
 		runner.pause();
 
-		const gameClient = new GameClient<EngineVersion>({ runner, game, type: "passive", renderingMode: params.renderingMode });
-		await gameClient.initialize();
-		return gameClient;
+		return new GameClient<EngineVersion>({ runner, game, type: "passive", renderingMode: params.renderingMode });
 	}
 
 	/**
@@ -181,6 +177,9 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	}
 
 	protected handleRunnerError(err: any): void {
+		if (err.code === "MODULE_NOT_FOUND" && /canvas/.test(err.message)) {
+			console.warn(`Cannot find module canvas. Please Install canvas with "npm i -D canvas".`);
+		}
 		throw err;
 	}
 }

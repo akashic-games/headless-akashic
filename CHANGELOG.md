@@ -1,8 +1,7 @@
 # CHANGELOG
 
-## 3.２.０
+## 3.1.1
 * node-canvas を devDependencies へ変更
-* `GameClient#initialize()`を追加し canvas を動的 import するよう変更
 
 ## 3.1.0
 * node-canvas を optionalDependencies へ移動
