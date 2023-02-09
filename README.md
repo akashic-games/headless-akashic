@@ -66,16 +66,6 @@ const GameContext = require("@akashic/headless-akashic").GameContext;
 
 ## note
 
-### canvas の利用時の注意点
-
-canvas を利用し描画内容取得等を行う場合には、コンテンツ側で下記コマンドを実行し canvas をインストールしてください。
-
-```sh
-npm i -D canvas
-```
-
-canvas 利用時にライブラリが足りないなどのエラーが出た場合は、[node-canvasの Compiling](https://github.com/Automattic/node-canvas#compiling) を参照し実行環境に適したライブラリをインストールしてください。
-
 ### コンテンツの描画内容の取得
 
 akashic-engine@3.0.0 以降に対応したコンテンツであれば `GameClient#getPrimarySurfaceCanvas()` を利用して描画内容を取得できます。
@@ -93,6 +83,16 @@ const client = await context.getGameClient({ renderingMode: "canvas" }); // rend
 const canvas = client.getPrimarySurfaceCanvas();
 fs.writeFileSync("output.png", canvas.toBuffer()); // "output.png" に描画内容を書き出し
 ```
+
+#### canvas の利用時の注意事項
+
+canvas を利用し描画内容取得等を行う場合には、コンテンツ側で下記コマンドを実行し canvas をインストールしてください。
+
+```sh
+npm i -D canvas
+```
+
+canvas 利用時にライブラリが足りないなどのエラーが出た場合は、[node-canvasの Compiling](https://github.com/Automattic/node-canvas#compiling) を参照し実行環境に適したライブラリをインストールしてください。
 
 ### 空のゲームコンテンツの仕様
 
