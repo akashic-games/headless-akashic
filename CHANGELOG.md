@@ -1,7 +1,8 @@
 # CHANGELOG
 
-## 3.1.1
+## 4.0.0
 * node-canvas を devDependencies へ変更
+  * `GameContext#getGameClient()` で `renderingMode: "canvas"` に指定していた場合、別途 node-canvas のインストールが必要になります。
 
 ## 3.1.0
 * node-canvas を optionalDependencies へ移動
