@@ -145,17 +145,19 @@ export class GameClient<EngineVersion extends keyof EngineVersions = keyof Engin
 	 * @param param ImageAsset の生成に必要なパラメータ。
 	 */
 	createDummyImageAsset(param: GameClientCreateImageAssetParameterObject): any {
-		const resFac = this.runner.platform.getResourceFactory();
 		const id = param.id ?? uuid.v4();
 		const path = param.path ?? uuid.v4();
 		const version = this.runner.engineVersion;
 
 		if (version === "1") {
-			return resFac.createImageAsset(id, path, param.width, param.height);
+			const game = this.game as RunnerV1Game;
+			return game.resourceFactory.createImageAsset(id, path, param.width, param.height);
 		} else if (version === "2") {
-			return resFac.createImageAsset(id, path, param.width, param.height);
+			const game = this.game as RunnerV2Game;
+			return game.resourceFactory.createImageAsset(id, path, param.width, param.height);
 		} else if (version === "3") {
-			return resFac.createImageAsset(id, path, param.width, param.height);
+			const game = this.game as RunnerV3Game;
+			return game.resourceFactory.createImageAsset(id, path, param.width, param.height);
 		}
 
 		throw Error("GameClient#createAudioAsset(): Could not create a image asset");
@@ -166,7 +168,6 @@ export class GameClient<EngineVersion extends keyof EngineVersions = keyof Engin
 	 * @param param AudioAsset の生成に必要なパラメータ。
 	 */
 	createDummyAudioAsset(param: GameClientCreateAudioAssetParameterObject): any {
-		const resFac = this.runner.platform.getResourceFactory();
 		const id = param.id ?? uuid.v4();
 		const path = param.path ?? uuid.v4();
 		const loop = !!param.loop;
@@ -175,15 +176,15 @@ export class GameClient<EngineVersion extends keyof EngineVersions = keyof Engin
 		if (version === "1") {
 			const game = this.game as RunnerV1Game;
 			const system = param.systemId ? game._audioSystemManager[param.systemId] : game._audioSystemManager[game.defaultAudioSystemId];
-			return resFac.createAudioAsset(id, path, param.duration, system, loop, param.hint);
+			return game.resourceFactory.createAudioAsset(id, path, param.duration, system, loop, param.hint);
 		} else if (version === "2") {
 			const game = this.game as RunnerV2Game;
 			const system = param.systemId ? game._audioSystemManager[param.systemId] : game._audioSystemManager[game.defaultAudioSystemId];
-			return resFac.createAudioAsset(id, path, param.duration, system, loop, param.hint);
+			return game.resourceFactory.createAudioAsset(id, path, param.duration, system, loop, param.hint);
 		} else if (version === "3") {
 			const game = this.game as RunnerV3Game;
 			const system = param.systemId ? game.audio[param.systemId] : game.audio[game.defaultAudioSystemId];
-			return resFac.createAudioAsset(id, path, param.duration, system, loop, param.hint);
+			return game.resourceFactory.createAudioAsset(id, path, param.duration, system, loop, param.hint);
 		}
 
 		throw Error("GameClient#createAudioAsset(): Could not create a audio asset");
