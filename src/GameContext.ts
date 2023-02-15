@@ -177,6 +177,9 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	}
 
 	protected handleRunnerError(err: any): void {
+		if (err.code === "MODULE_NOT_FOUND" && /canvas/.test(err.message)) {
+			console.error(`If "canvas" is specified for renderingMode, node-canvas is required.`);
+		}
 		throw err;
 	}
 }

@@ -72,6 +72,12 @@ akashic-engine@3.0.0 以降に対応したコンテンツであれば `GameClien
 headless-akashic@3.1.0 時点では、[node-canvas][node-canvas] での描画出力のみをサポートしています。
 詳細な API 仕様については [こちら][node-canvas] を参照してください。
 
+node-canvas がインストールされていない場合は下記コマンドを実行してください。
+
+```sh
+npm i -D canvas
+```
+
 以下はコンテンツの描画内容を png として保存する例です。
 
 ```javascript
