@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 4.1.0
+* headless-driver@2.10.0 に追従
+
 ## 4.0.0
 * node-canvas を devDependencies へ変更
   * `GameContext#getGameClient()` で `renderingMode: "canvas"` に指定していた場合、別途 node-canvas のインストールが必要になります。
