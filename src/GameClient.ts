@@ -1,5 +1,13 @@
-import { RunnerV1, RunnerV1Game, RunnerV2, RunnerV2Game, RunnerV3, RunnerV3Game } from "@akashic/headless-driver";
-import type { RunnerAdvanceConditionFunc, RunnerRenderingMode } from "@akashic/headless-driver";
+import { RunnerV3 } from "@akashic/headless-driver";
+import type {
+	RunnerAdvanceConditionFunc,
+	RunnerRenderingMode,
+	RunnerV1,
+	RunnerV1Game,
+	RunnerV2,
+	RunnerV2Game,
+	RunnerV3Game
+} from "@akashic/headless-driver";
 import type { Canvas } from "canvas";
 import * as uuid from "uuid";
 import type { EngineVersions } from "./types";

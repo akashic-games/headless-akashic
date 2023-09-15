@@ -1,9 +1,10 @@
-import { DumpedPlaylog, PlayManager, RunnerManager, RunnerRenderingMode, setSystemLogger } from "@akashic/headless-driver";
+import type { DumpedPlaylog, RunnerRenderingMode } from "@akashic/headless-driver";
+import { PlayManager, RunnerManager, setSystemLogger } from "@akashic/headless-driver";
 import { activePermission, EMPTY_V3_PATH, passivePermission } from "./constants";
 import { GameClient } from "./GameClient";
 import { DefaultLogger } from "./loggers/DefaultLogger";
 import { VerboseLogger } from "./loggers/VerboseLogger";
-import { EngineVersions } from "./types";
+import type { EngineVersions } from "./types";
 
 export interface GameContextParameterObject {
 	/**

@@ -1,4 +1,4 @@
-import { RunnerV1Game, RunnerV1_g, RunnerV2Game, RunnerV2_g, RunnerV3Game, RunnerV3_g } from "@akashic/headless-driver";
+import type { RunnerV1Game, RunnerV1_g, RunnerV2Game, RunnerV2_g, RunnerV3Game, RunnerV3_g } from "@akashic/headless-driver";
 
 export interface EngineVersions {
 	1: {

@@ -1,5 +1,5 @@
 import * as path from "path";
-import { Permission } from "@akashic/amflow";
+import type { Permission } from "@akashic/amflow";
 
 export const activePermission: Permission = {
 	readTick: true,
