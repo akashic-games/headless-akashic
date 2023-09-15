@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## unreleased changes
+* `GameClient#sendJoinEvent()` を追加
+* `GameClient#sendLeaveEvent()` を追加
+* `GameClient#sendMessageEvent()` に引数 `eventFlags: number` を追加
+
 ## 4.1.0
 * headless-driver@2.10.0 に追従
 
