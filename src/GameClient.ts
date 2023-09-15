@@ -128,8 +128,27 @@ export class GameClient<EngineVersion extends keyof EngineVersions = keyof Engin
 	 * @param message メッセージ
 	 * @param playerId プレイヤーID
 	 */
-	sendMessage(message: any, playerId?: string): void {
-		this.runner.amflow.sendEvent([0x20, 0, playerId, message]);
+	sendMessage(message: any, playerId?: string, eventFlags: number = 0): void {
+		this.runner.amflow.sendEvent([0x20, eventFlags, playerId, message]);
+	}
+
+	/**
+	 * 任意の g.JoinEvent を送信する。
+	 * @param playerId プレイヤーID
+	 * @param playerName プレイヤー名
+	 * @param eventFlags イベントフラグ
+	 */
+	sendJoinEvent(playerId: string, playerName: string, eventFlags: number = 0): void {
+		this.runner.amflow.sendEvent([0x00, eventFlags, playerId, playerName]);
+	}
+
+	/**
+	 * 任意の g.LeaveEvent を送信する。
+	 * @param playerId プレイヤーID
+	 * @param eventFlags イベントフラグ
+	 */
+	sendLeaveEvent(playerId: string, eventFlags: number = 0): void {
+		this.runner.amflow.sendEvent([0x01, eventFlags, playerId]);
 	}
 
 	/**
