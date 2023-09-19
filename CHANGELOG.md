@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## unreleased changes
+## 4.2.0
 * `GameClient#sendJoinEvent()` を追加
 * `GameClient#sendLeaveEvent()` を追加
 * `GameClient#sendMessageEvent()` に引数 `eventFlags: number` を追加
