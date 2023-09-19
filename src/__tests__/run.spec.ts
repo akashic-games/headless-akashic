@@ -77,7 +77,7 @@ describe("run content", () => {
 		expect(game.fps).toBe(60);
 
 		// advance to the entry scene
-		await activeClient.advanceUntil(() => activeClient.game.scene().name === "entry-scene");
+		await activeClient.advanceUntil(() => activeClient.game.scene()!.name === "entry-scene");
 
 		const activeClientScene = activeClient.game.scene()!;
 		expect(activeClientScene).toBeInstanceOf(activeClient.g.Scene);
@@ -89,7 +89,7 @@ describe("run content", () => {
 		expect(passiveClient.type).toBe("passive");
 
 		// advance to the entry scene
-		await passiveClient.advanceUntil(() => passiveClient.game.scene().name === "entry-scene");
+		await passiveClient.advanceUntil(() => passiveClient.game.scene()!.name === "entry-scene");
 
 		const passiveClientScene = passiveClient.game.scene()!;
 		// same as the active client
@@ -109,6 +109,122 @@ describe("run content", () => {
 		// enough time passed, must be removed all shot sprites
 		await context.advance(3000);
 		expect(activeClientScene.children.length).toBe(1);
+
+		await context.destroy();
+	});
+
+	it("send message event", async () => {
+		const context = new GameContext<3>({ gameJsonPath });
+		const activeClient = await context.getGameClient();
+		const passiveClient = await context.createPassiveGameClient();
+
+		await activeClient.advanceUntil(() => activeClient.game.scene()!.name === "entry-scene");
+		await passiveClient.advanceUntil(() => passiveClient.game.scene()!.name === "entry-scene");
+
+		activeClient.sendMessage({ value: "foo" }, ":akashic", 0b00010);
+		await activeClient.advanceUntil(() => 1 <= activeClient.game!.vars.messages?.length);
+
+		const activeMessage = activeClient.game!.vars.messages[0];
+		expect(activeMessage.data).toEqual({ value: "foo" });
+		expect(activeMessage.eventFlags).toBe(0b00010);
+		expect(activeMessage.local).toBe(false);
+		expect(activeMessage.player).toEqual({ id: ":akashic" });
+
+		await passiveClient.advanceUntil(() => 1 <= passiveClient.game!.vars.messages?.length);
+		const passiveMessage = passiveClient.game!.vars.messages[0];
+		expect(passiveMessage.data).toEqual({ value: "foo" });
+		expect(passiveMessage.eventFlags).toBe(0b00010);
+		expect(passiveMessage.local).toBe(false);
+		expect(passiveMessage.player).toEqual({ id: ":akashic" });
+
+		await context.destroy();
+	});
+
+	it("send join/leave event", async () => {
+		const context = new GameContext<3>({ gameJsonPath });
+		const activeClient = await context.getGameClient();
+		const passiveClient = await context.createPassiveGameClient();
+
+		await activeClient.advanceUntil(() => activeClient.game.scene()!.name === "entry-scene");
+		await passiveClient.advanceUntil(() => passiveClient.game.scene()!.name === "entry-scene");
+
+		// Join
+		{
+			// active 1
+			activeClient.sendJoinEvent(":akashic", "system-user");
+			await activeClient.advanceUntil(() => 1 <= activeClient.game!.vars.joins?.length);
+			const activeJoins = activeClient.game!.vars.joins;
+			expect(activeJoins[0].player).toEqual({
+				id: ":akashic",
+				name: "system-user"
+			});
+			expect(activeJoins[0].eventFlags).toBe(0);
+
+			// passive 1
+			await passiveClient.advanceUntil(() => 1 <= passiveClient.game!.vars.joins?.length);
+			const passiveJoins = passiveClient.game!.vars.joins;
+			expect(passiveJoins[0].player).toEqual({
+				id: ":akashic",
+				name: "system-user"
+			});
+			expect(passiveJoins[0].eventFlags).toBe(0);
+
+			// active 2
+			activeClient.sendJoinEvent("another-user-id", "another-user-name", 0b00010);
+			await activeClient.advanceUntil(() => 2 <= activeClient.game!.vars.joins?.length);
+			expect(activeJoins[1].player).toEqual({
+				id: "another-user-id",
+				name: "another-user-name"
+			});
+			expect(activeJoins[1].eventFlags).toBe(0b00010);
+
+			// passive 2
+			await passiveClient.advanceUntil(() => 2 <= passiveClient.game!.vars.joins?.length);
+			expect(passiveJoins[1].player).toEqual({
+				id: "another-user-id",
+				name: "another-user-name"
+			});
+			expect(passiveJoins[1].eventFlags).toBe(0b00010);
+		}
+
+		// Leave
+		{
+			// active 1
+			activeClient.sendLeaveEvent(":akashic");
+			await activeClient.advanceUntil(() => 1 <= activeClient.game!.vars.leaves?.length);
+			const activeLeaves = activeClient.game!.vars.leaves;
+			expect(activeLeaves[0].player).toEqual({
+				id: ":akashic",
+				name: "system-user"
+			});
+			expect(activeLeaves[0].eventFlags).toBe(0);
+
+			// passive 1
+			await passiveClient.advanceUntil(() => 1 <= passiveClient.game!.vars.leaves?.length);
+			const passiveLeaves = passiveClient.game!.vars.leaves;
+			expect(passiveLeaves[0].player).toEqual({
+				id: ":akashic",
+				name: "system-user"
+			});
+			expect(passiveLeaves[0].eventFlags).toBe(0);
+
+			// active 2
+			activeClient.sendLeaveEvent("another-user-id", 0b00001);
+			await activeClient.advanceUntil(() => 2 <= activeClient.game!.vars.leaves?.length);
+			expect(activeLeaves[1].player).toEqual({
+				id: "another-user-id",
+				name: "another-user-name"
+			});
+			expect(activeLeaves[1].eventFlags).toBe(0b00001);
+
+			// passive 2
+			await passiveClient.advanceUntil(() => 2 <= passiveClient.game!.vars.leaves?.length);
+			expect(passiveLeaves[1].player).toEqual({
+				id: "another-user-id",
+				name: "another-user-name"
+			});
+			expect(passiveLeaves[1].eventFlags).toBe(0b00001);
+		}
 
 		await context.destroy();
 	});

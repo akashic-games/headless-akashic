@@ -1,5 +1,13 @@
-import { RunnerV1, RunnerV1Game, RunnerV2, RunnerV2Game, RunnerV3, RunnerV3Game } from "@akashic/headless-driver";
-import type { RunnerAdvanceConditionFunc, RunnerRenderingMode } from "@akashic/headless-driver";
+import { RunnerV3 } from "@akashic/headless-driver";
+import type {
+	RunnerAdvanceConditionFunc,
+	RunnerRenderingMode,
+	RunnerV1,
+	RunnerV1Game,
+	RunnerV2,
+	RunnerV2Game,
+	RunnerV3Game
+} from "@akashic/headless-driver";
 import type { Canvas } from "canvas";
 import * as uuid from "uuid";
 import type { EngineVersions } from "./types";
@@ -120,8 +128,27 @@ export class GameClient<EngineVersion extends keyof EngineVersions = keyof Engin
 	 * @param message メッセージ
 	 * @param playerId プレイヤーID
 	 */
-	sendMessage(message: any, playerId?: string): void {
-		this.runner.amflow.sendEvent([0x20, 0, playerId, message]);
+	sendMessage(message: any, playerId?: string, eventFlags: number = 0): void {
+		this.runner.amflow.sendEvent([0x20, eventFlags, playerId, message]);
+	}
+
+	/**
+	 * 任意の g.JoinEvent を送信する。
+	 * @param playerId プレイヤーID
+	 * @param playerName プレイヤー名
+	 * @param eventFlags イベントフラグ
+	 */
+	sendJoinEvent(playerId: string, playerName: string, eventFlags: number = 0): void {
+		this.runner.amflow.sendEvent([0x00, eventFlags, playerId, playerName]);
+	}
+
+	/**
+	 * 任意の g.LeaveEvent を送信する。
+	 * @param playerId プレイヤーID
+	 * @param eventFlags イベントフラグ
+	 */
+	sendLeaveEvent(playerId: string, eventFlags: number = 0): void {
+		this.runner.amflow.sendEvent([0x01, eventFlags, playerId]);
 	}
 
 	/**

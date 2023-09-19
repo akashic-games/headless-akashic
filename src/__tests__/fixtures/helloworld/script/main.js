@@ -64,6 +64,22 @@ function main(param) {
         scene.append(player);
         // ここまでゲーム内容を記述します
     });
+
+    scene.onMessage.add(function(ev) {
+      g.game.vars.messages = g.game.vars.messages ?? [];
+      g.game.vars.messages.push(ev);
+    });
+
+    g.game.onJoin.add(function(ev) {
+      g.game.vars.joins = g.game.vars.joins ?? [];
+      g.game.vars.joins.push(ev);
+    });
+
+    g.game.onLeave.add(function(ev) {
+      g.game.vars.leaves = g.game.vars.leaves ?? [];
+      g.game.vars.leaves.push(ev);
+    });
+
     g.game.pushScene(scene);
 }
 
