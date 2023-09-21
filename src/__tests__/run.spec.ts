@@ -66,7 +66,7 @@ describe("run content", () => {
 
 	it("helloworld", async () => {
 		const context = new GameContext<3>({ gameJsonPath });
-		const activeClient = await context.getGameClient();
+		const activeClient = await context.getGameClient({ gameArgs: "active" });
 
 		expect(activeClient.type).toBe("active");
 
@@ -85,7 +85,7 @@ describe("run content", () => {
 		expect(Object.keys(activeClientScene.assets).length).toBe(4); // player, shot, se, dummy_text
 		expect(activeClientScene.children.length).toBe(1);
 
-		const passiveClient = await context.createPassiveGameClient();
+		const passiveClient = await context.createPassiveGameClient({ gameArgs: "passive" });
 		expect(passiveClient.type).toBe("passive");
 
 		// advance to the entry scene
