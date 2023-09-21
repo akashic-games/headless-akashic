@@ -39,6 +39,11 @@ export interface GameClientStartParameterObject {
 	externalValue?: {
 		[key: string]: any;
 	};
+
+	/**
+	 * ゲーム起動引数。
+	 */
+	gameArgs?: any;
 }
 
 /**
@@ -92,7 +97,8 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 			allowedUrls: null,
 			trusted: true,
 			renderingMode: params.renderingMode,
-			externalValue: params.externalValue
+			externalValue: params.externalValue,
+			gameArgs: params.gameArgs
 		});
 
 		const runner = runnerManager.getRunner(runnerId)!;
@@ -124,7 +130,8 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 			allowedUrls: null,
 			trusted: true,
 			renderingMode: params.renderingMode,
-			externalValue: params.externalValue
+			externalValue: params.externalValue,
+			gameArgs: params.gameArgs
 		});
 
 		const runner = runnerManager.getRunner(runnerId)!;
