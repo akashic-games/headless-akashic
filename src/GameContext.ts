@@ -1,4 +1,4 @@
-import type { DumpedPlaylog, RunnerRenderingMode } from "@akashic/headless-driver";
+import type { DumpedPlaylog, RunnerPlayer, RunnerRenderingMode } from "@akashic/headless-driver";
 import { PlayManager, RunnerManager, setSystemLogger } from "@akashic/headless-driver";
 import { activePermission, EMPTY_V3_PATH, passivePermission } from "./constants";
 import { GameClient } from "./GameClient";
@@ -26,6 +26,11 @@ export interface GameContextParameterObject {
 }
 
 export interface GameClientStartParameterObject {
+	/**
+	 * プレイヤー情報。
+	 */
+	player?: RunnerPlayer;
+
 	/**
 	 * ゲーム画面のレンダリングモード。`"canvas"` または `"none"` が指定できる。
 	 * `"canvas"` を指定すると `getPrimarySurfaceCanvas()` によりゲーム画面の描画データが取得できるようになる。
@@ -93,6 +98,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 			playId,
 			amflow,
 			playToken,
+			player: params.player,
 			executionMode: "active",
 			allowedUrls: null,
 			trusted: true,
@@ -126,6 +132,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 			playId,
 			amflow,
 			playToken,
+			player: params.player,
 			executionMode: "passive",
 			allowedUrls: null,
 			trusted: true,

@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 4.4.0
+* `GameContext#getGameClient()`, `GameContext#createPassiveGameClient()` に `player` を追加
+
 ## 4.3.0
 * `GameContext#getGameClient()`, `GameContext#createPassiveGameClient()` にゲーム起動引数 `gameArgs` を追加
 
