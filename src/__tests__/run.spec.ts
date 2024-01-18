@@ -252,3 +252,123 @@ describe("run content", () => {
 		jest.clearAllMocks();
 	});
 });
+
+describe("raise-event", () => {
+	it("GameContext#advanceEach(): can progress the state frame by frame and handle events for each instance", async () => {
+		const context = new GameContext({
+			gameJsonPath: path.join(__dirname, "fixtures", "raise-event", "game.json")
+		});
+		const activeClient = await context.getGameClient();
+
+		const makeMessageEvent = (time: number): [number, any] => [time, { message: `time: ${time}` }];
+
+		// passiveClient1
+		await context.createPassiveGameClient({
+			player: {
+				id: "passive-player-1",
+				name: "passive-player-1"
+			},
+			gameArgs: {
+				messageEvents: [1000, 3000, 5001].map(time => makeMessageEvent(time))
+			}
+		});
+
+		// passiveClient2
+		await context.createPassiveGameClient({
+			player: {
+				id: "passive-player-2",
+				name: "passive-player-1"
+			},
+			gameArgs: {
+				messageEvents: [0, 1000, 2000, 3000, 4000, 4933, 5001].map(time => makeMessageEvent(time))
+			}
+		});
+
+		await context.advanceEach(5000);
+
+		expect(activeClient.game.vars.messageEvents).toEqual([
+			// 同一タイミングであれば作成したインスタンス順に送信される
+			{
+				type: "message",
+				eventFlags: 2,
+				local: false,
+				player: {
+					id: "passive-player-1"
+				},
+				data: {
+					message: "time: 1000"
+				}
+			},
+			{
+				type: "message",
+				eventFlags: 2,
+				local: false,
+				player: {
+					id: "passive-player-2"
+				},
+				data: {
+					message: "time: 1000"
+				}
+			},
+			{
+				type: "message",
+				eventFlags: 2,
+				local: false,
+				player: {
+					id: "passive-player-2"
+				},
+				data: {
+					message: "time: 2000"
+				}
+			},
+			{
+				type: "message",
+				eventFlags: 2,
+				local: false,
+				player: {
+					id: "passive-player-1"
+				},
+				data: {
+					message: "time: 3000"
+				}
+			},
+			{
+				type: "message",
+				eventFlags: 2,
+				local: false,
+				player: {
+					id: "passive-player-2"
+				},
+				data: {
+					message: "time: 3000"
+				}
+			},
+			{
+				type: "message",
+				eventFlags: 2,
+				local: false,
+				player: {
+					id: "passive-player-2"
+				},
+				data: {
+					message: "time: 4000"
+				}
+			},
+			// 最終フレームの一つ直前までに送信されていることが期待されているギリギリのタイミング
+			// 5000 - (2フレーム分) = 5000 - (1000 / game.fps) * 2 = 4933.33 > 4933 > 4933.33 - (1フレーム分)
+			{
+				type: "message",
+				eventFlags: 2,
+				local: false,
+				player: {
+					id: "passive-player-2"
+				},
+				data: {
+					message: "time: 4933"
+				}
+			}
+		]);
+
+		await context.destroy();
+	});
+});

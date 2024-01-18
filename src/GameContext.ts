@@ -170,13 +170,38 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 
 	/**
 	 * GameContext の状態を指定ミリ秒だけ進める。
+	 * 本メソッドを利用した場合、経過中に発生した任意のイベントの処理が次のフレームまで遅延されてしまうことに注意。
+	 * 経過中に発生したイベントをフレームごとに処理したい場合は advanceEach() を利用すること。
 	 * @param ms 進めるミリ秒
 	 */
 	async advance(ms: number): Promise<void> {
 		const { runnerManager } = this;
 		const runners = runnerManager.getRunners();
-		for (let i = 0; i < runners.length; i++) {
-			await runners[i].advance(ms);
+		for (const runner of runners) {
+			await runner.advance(ms);
+		}
+	}
+
+	/**
+	 * GameContext の状態を、それぞれのインスタンスに対して一フレームづつ処理しつつ、指定ミリ秒だけ進める。
+	 * @param ms 進めるミリ秒
+	 */
+	async advanceEach(ms: number): Promise<void> {
+		const { runnerManager } = this;
+		const runners = runnerManager.getRunners();
+
+		const fps = (runners[0] as any)?.fps; // FIXME: FPS を取る手段の確立
+		if (!fps) {
+			throw new Error("Cannot call advanceEach() before starting");
+		}
+
+		const delta = 1000 / fps;
+		let elapsed = 0;
+		while (elapsed <= ms) {
+			for (const runner of runners) {
+				await runner.advance(delta);
+			}
+			elapsed += delta;
 		}
 	}
 
