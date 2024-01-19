@@ -190,12 +190,16 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 		const { runnerManager } = this;
 		const runners = runnerManager.getRunners();
 
-		const fps = (runners[0] as any)?.fps; // FIXME: FPS を取る手段の確立
-		if (!fps) {
+		// FIXME: FPS を取る手段の確立
+		const maxFps = (runners as unknown as { fps: number | null }[]).reduce(
+			(max, current) => (max < current.fps ? current.fps : max),
+			0
+		);
+		if (!maxFps) {
 			throw new Error("Cannot call advanceEach() before starting");
 		}
 
-		const delta = 1000 / fps;
+		const delta = 1000 / maxFps;
 		let elapsed = 0;
 		while (elapsed <= ms) {
 			for (const runner of runners) {
