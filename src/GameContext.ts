@@ -170,7 +170,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 
 	/**
 	 * GameContext の状態を指定ミリ秒だけ進める。
-	 * 本メソッドを利用した場合、経過中に発生した任意のイベントの処理が次のフレームまで遅延されてしまうことに注意。
+	 * 本メソッドを利用した場合、経過中に発生したイベントは、この advance() の中では処理されないことに注意。
 	 * 経過中に発生したイベントをフレームごとに処理したい場合は advanceEach() を利用すること。
 	 * @param ms 進めるミリ秒
 	 */
