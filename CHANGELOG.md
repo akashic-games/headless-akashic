@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.5.0
+* `GameContext#advanceEach()` を追加
+* `GameContext#advance()` の制限事項についてコメントを追加
+
 ## 4.4.0
 * `GameContext#getGameClient()`, `GameContext#createPassiveGameClient()` に `player` を追加
 
