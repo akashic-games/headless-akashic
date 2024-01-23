@@ -183,7 +183,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	}
 
 	/**
-	 * GameContext の状態を、それぞれのインスタンスに対して一フレームづつ処理しつつ、指定ミリ秒だけ進める。
+	 * GameContext の各インスタンスの処理を1フレームずつ、指定ミリ秒分だけ進める。
 	 * @param ms 進めるミリ秒
 	 */
 	async advanceEach(ms: number): Promise<void> {
