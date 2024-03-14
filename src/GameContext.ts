@@ -208,11 +208,11 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	/**
 	 * GameContext の状態を一フレームだけ進める。
 	 */
-	step(): void {
+	async step(): Promise<void> {
 		const { runnerManager } = this;
 		const runners = runnerManager.getRunners();
 		for (let i = 0; i < runners.length; i++) {
-			runners[i].step();
+			await runners[i].step();
 		}
 	}
 
