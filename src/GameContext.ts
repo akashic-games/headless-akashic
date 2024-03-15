@@ -211,9 +211,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	async step(): Promise<void> {
 		const { runnerManager } = this;
 		const runners = runnerManager.getRunners();
-		for (let i = 0; i < runners.length; i++) {
-			await runners[i].step();
-		}
+		await Promise.allSettled(runners.map(runner => runner.step()));
 	}
 
 	protected handleRunnerError(err: any): void {
