@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.6.0
+* headless-driver@2.14.0 に追従
+* `GameContext#step()` の戻り値の型を `Promise<void>` に変更
+
 ## 4.5.0
 * `GameContext#advanceEach()` を追加
 * `GameContext#advance()` の制限事項についてコメントを追加

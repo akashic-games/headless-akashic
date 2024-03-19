@@ -99,11 +99,11 @@ describe("run content", () => {
 
 		// generate a sprite (shot) if clicked on the game canvas
 		activeClient.sendPointDown(Math.ceil(Math.random() * game.width), Math.ceil(Math.random() * game.height), 0);
-		context.step();
+		await context.step();
 		expect(activeClientScene.children.length).toBe(2);
 
 		activeClient.sendPointDown(Math.ceil(Math.random() * game.width), Math.ceil(Math.random() * game.height), 0);
-		context.step();
+		await context.step();
 		expect(activeClientScene.children.length).toBe(3);
 
 		// enough time passed, must be removed all shot sprites
