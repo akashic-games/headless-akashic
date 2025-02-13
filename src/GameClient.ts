@@ -8,11 +8,12 @@ import type {
 	RunnerV2Game,
 	RunnerV3Game
 } from "@akashic/headless-driver";
-import type { Canvas } from "canvas";
 import * as uuid from "uuid";
 import type { EngineVersions } from "./types";
 
 type Runner = RunnerV1 | RunnerV2 | RunnerV3;
+
+type Canvas = ReturnType<RunnerV3["getPrimarySurfaceCanvas"]>;
 
 export type GameClientInstanceType = "active" | "passive";
 
@@ -157,11 +158,13 @@ export class GameClient<EngineVersion extends keyof EngineVersions = keyof Engin
 	getPrimarySurfaceCanvas(): Canvas {
 		const mode = this.renderingMode;
 
-		if (mode === "canvas") {
+		if (mode === "canvas" || mode === "@napi-rs/canvas") {
 			if (this.runner instanceof RunnerV3) {
 				return this.runner.getPrimarySurfaceCanvas();
 			}
-			throw new Error("GameClient#getPrimarySurface(): renderingMode 'canvas' is only supported on akashic-engine@^3.0.0");
+			throw new Error(
+				"GameClient#getPrimarySurface(): renderingMode 'canvas' or '@napi-rs/canvas' is only supported in akashic-engine@^3.0.0."
+			);
 		}
 
 		throw new Error(`GameClient#getPrimarySurface(): renderingMode "${mode}" is not supported`);

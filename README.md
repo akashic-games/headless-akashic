@@ -22,9 +22,9 @@ npm install @akashic/headless-akashic -D
 Node.js 上でのサンプルコードは以下になります。
 
 ```javascript
-const assert = require("assert");
-const path = require("path");
-const GameContext = require("@akashic/headless-akashic").GameContext;
+import * as assert from "node:assert";
+import * as path from "node:path";
+import { GameContext } from "@akashic/headless-akashic";
 
 (async () => {
   const context = new GameContext({
@@ -69,25 +69,33 @@ const GameContext = require("@akashic/headless-akashic").GameContext;
 ### コンテンツの描画内容の取得
 
 akashic-engine@3.0.0 以降に対応したコンテンツであれば `GameClient#getPrimarySurfaceCanvas()` を利用して描画内容を取得できます。
-headless-akashic@3.1.0 時点では、[node-canvas][node-canvas] での描画出力のみをサポートしています。
-詳細な API 仕様については [こちら][node-canvas] を参照してください。
+headless-akashic@4.7.0 時点で以下のモジュールによる描画出力をサポートしています。
 
-node-canvas がインストールされていない場合は下記コマンドを実行してください。
+* [node-canvas][node-canvas]
+* [@napi-rs/canvas][napi-canvas]
+
+`renderingMode: "canvas"` の場合は下記コマンドで node-canvas をインストールしてください。
 
 ```sh
 npm i -D canvas
 ```
 
+`renderingMode: "@napi-rs/canvas"` の場合は下記コマンドで @napi-rs/canvas をインストールしてください。
+
+```sh
+npm i -D @napi-rs/canvas
+```
+
 以下はコンテンツの描画内容を png として保存する例です。
 
 ```javascript
-const fs = require("fs");
+import { writeFileSync } from "node:fs";
 
 // ...
 
 const client = await context.getGameClient({ renderingMode: "canvas" }); // renderingMode を指定
 const canvas = client.getPrimarySurfaceCanvas();
-fs.writeFileSync("output.png", canvas.toBuffer()); // "output.png" に描画内容を書き出し
+writeFileSync("output.png", canvas.toBuffer("image/png")); // "output.png" に描画内容を書き出し
 ```
 
 ### 空のゲームコンテンツの仕様
@@ -127,12 +135,17 @@ scene.asset.getImage(...) // akashic-engine@3 の型定義を参照
 
 ```typescript
 import type { RunnerV3Game } from "@akashic/headless-akashic";
+import type { Canvas } from "@napi-rs/canvas";
 
 // ...
 
 const context = new GameContext({ gameJsonPath });
 const client = await context.getGameClient();
 const game = client.game as RunnerV3Game;
+
+// ...
+
+const canvas = client.getPrimarySurfaceCanvas() as Canvas;
 
 // ...
 
@@ -206,3 +219,4 @@ const player = new Player({
 ```
 
 [node-canvas]: https://github.com/Automattic/node-canvas
+[napi-canvas]: https://github.com/Brooooooklyn/canvas

@@ -1,4 +1,4 @@
-import { SystemLogger } from "@akashic/headless-driver";
+import type { SystemLogger } from "@akashic/headless-driver";
 
 export class SilentLogger implements SystemLogger {
 	info(..._messages: any[]): void {
