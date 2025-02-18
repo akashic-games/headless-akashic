@@ -161,6 +161,11 @@ const canvas = client.getPrimarySurfaceCanvas() as Canvas;
 
 ## limitation
 
+### 日本語の文字列の描画
+
+バージョン `0.1.66` 時点の `@napi-rs/canvas` では、初期状態のままでは `g.DynamicFont` で日本語などの非 ASCII 文字を描画できません。
+`g.DynamicFont` で日本語を描画する場合、[`@napi-rs/canvas` の README][napi-canvas] を参考に日本語対応のフォントファイルを別途読み込んでください
+
 ### 音声の再生に関して
 
 `@akashic/headless-akashic@2.0.0` において、headless-akashic 上で実行されているコンテンツの音声再生をサポートしていません。
