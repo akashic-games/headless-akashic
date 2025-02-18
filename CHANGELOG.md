@@ -1,6 +1,6 @@
 # CHANGELOG
 
-# 4.7.0
+## 4.7.0
 * headless-driver@2.16.0 に追従
 
 ## 4.6.0
