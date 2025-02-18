@@ -163,7 +163,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 		}
 
 		if (playId) {
-			playManager.deletePlay(playId);
+			await playManager.deletePlay(playId);
 			this.playId = null;
 		}
 	}
@@ -215,8 +215,10 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	}
 
 	protected handleRunnerError(err: any): void {
-		if (err.code === "MODULE_NOT_FOUND" && /canvas/.test(err.message)) {
-			console.error(`If "canvas" is specified for renderingMode, node-canvas is required.`);
+		if (err.code === "MODULE_NOT_FOUND" && /@napi-rs\/canvas/.test(err.message)) {
+			console.error(`@napi-rs/canvas is required when "renderingMode" is set to "@napi-rs/canvas".`);
+		} else if (err.code === "MODULE_NOT_FOUND" && /canvas/.test(err.message)) {
+			console.error(`node-canvas is required when "renderingMode" is set to "canvas".`);
 		}
 		throw err;
 	}

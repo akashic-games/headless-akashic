@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 4.7.0
+* headless-driver@2.16.0 に追従
+
 ## 4.6.0
 * headless-driver@2.14.0 に追従
 * `GameContext#step()` の戻り値の型を `Promise<void>` に変更
