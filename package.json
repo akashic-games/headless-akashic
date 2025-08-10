@@ -81,7 +81,7 @@
   },
   "dependencies": {
     "@akashic/headless-driver": "^2.16.0",
-    "uuid": "^10.0.0"
+    "uuid": "^11.0.0"
   },
   "devDependencies": {
     "@akashic/eslint-config": "^2.1.0",
