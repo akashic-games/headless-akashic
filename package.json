@@ -24,20 +24,6 @@
     "lib",
     "fixtures"
   ],
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@akashic/eslint-config",
-      "prettier"
-    ],
-    "parserOptions": {
-      "project": "tsconfig.jest.json",
-      "sourceType": "module"
-    }
-  },
-  "eslintIgnore": [
-    "**/*.js"
-  ],
   "jest": {
     "collectCoverage": true,
     "coverageDirectory": "coverage",
@@ -84,21 +70,19 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "@akashic/eslint-config": "^2.1.0",
+    "@akashic/eslint-config": "^3.0.2",
     "@akashic/remark-preset-lint": "^0.1.2",
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^30.0.0",
     "@types/uuid": "^9.0.8",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
     "eslint": "^8.57.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-jest": "^27.9.0",
-    "jest": "^29.7.0",
+    "eslint-config-prettier": "^10.1.8",
+    "jest": "^30.0.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.4.2",
     "remark-cli": "^12.0.1",
     "rimraf": "^6.0.1",
-    "ts-jest": "^29.2.5",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.7.3"
   },
   "publishConfig": {
