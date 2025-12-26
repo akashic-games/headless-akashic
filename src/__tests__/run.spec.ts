@@ -236,7 +236,7 @@ describe("run content", () => {
 		await context.getGameClient();
 
 		// 一切のログが出力されていないことを確認
-		expect(consoleLogSpy).not.toBeCalled();
+		expect(consoleLogSpy).not.toHaveBeenCalled();
 
 		jest.clearAllMocks();
 	});
@@ -247,7 +247,7 @@ describe("run content", () => {
 		const context = new GameContext<3>({ gameJsonPath, verbose: true });
 		await context.getGameClient();
 
-		expect(consoleLogSpy).toBeCalled();
+		expect(consoleLogSpy).toHaveBeenCalled();
 
 		jest.clearAllMocks();
 	});
