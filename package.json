@@ -73,7 +73,7 @@
     "@akashic/eslint-config": "^3.0.2",
     "@akashic/remark-preset-lint": "^0.1.2",
     "@types/jest": "^30.0.0",
-    "@types/uuid": "^9.0.8",
+    "@types/uuid": "^11.0.0",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^10.1.8",
