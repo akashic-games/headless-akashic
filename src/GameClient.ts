@@ -228,4 +228,16 @@ export class GameClient<EngineVersion extends keyof EngineVersions = keyof Engin
 	async advanceUntil(condition: RunnerAdvanceConditionFunc, timeout: number = 5000): Promise<void> {
 		return this.runner.advanceUntil(condition, timeout);
 	}
+
+	/**
+	 * ゲームの状態を、このメソッドの呼び出し時点で得られる最新状態まで進める。
+	 * passive でのみ利用可能。
+	 * @param timeout タイムアウトまでのミリ時間。省略時は `5000` 。ゲーム内時間ではなく実時間である点に注意。
+	 */
+	async advanceLatest(timeout: number = 5000): Promise<void> {
+		if (this.type !== "passive") {
+			throw Error("GameClient#advanceLatest(): This method is only available for passive instances");
+		}
+		return this.runner.advanceLatest(timeout);
+	}
 }
