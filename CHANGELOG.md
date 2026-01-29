@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.8.0
+* headless-driver@2.18.0 に追従
+* `GameContext#advanceLatest()` を追加
+
 ## 4.7.0
 * headless-driver@2.16.0 に追従
 
