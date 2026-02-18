@@ -82,8 +82,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 			await this.playManager.deletePlay(this.playId);
 		}
 
-		const playId = await this.createPlay();
-		this.playId = playId;
+		this.playId = await this.createPlay();
 
 		const executionMode = this.params.playlog ? "passive" : ("active" satisfies GameClientInstanceType);
 		const { runner, game } = await this.createRunner(params, executionMode);
@@ -95,9 +94,8 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	 * passive の GameClient を生成する。
 	 */
 	async createPassiveGameClient(params: GameClientStartParameterObject = {}): Promise<GameClient<EngineVersion>> {
-		let { playId } = this;
-		if (playId == null) {
-			playId = await this.createPlay();
+		if (this.playId == null) {
+			this.playId = await this.createPlay();
 		}
 
 		const { runner, game } = await this.createRunner(params, "passive");
