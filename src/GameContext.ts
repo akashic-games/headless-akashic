@@ -76,18 +76,35 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	/**
 	 * プレイを初期化したうえで GameClient を返す。
 	 * playlog が与えられていたら passive の、そうでなければ active の GameClient を返す。
+	 * @deprecated 代わりに getActiveGameClient() または createPassiveGameClient() を利用すること
 	 */
 	async getGameClient(params: GameClientStartParameterObject = {}): Promise<GameClient<EngineVersion>> {
+		if (this.params.playlog) {
+			return this.createPassiveGameClient(params);
+		}
+		return this.getActiveGameClient(params);
+	}
+
+	/**
+	 * プレイを初期化したうえで active の GameClient を返す。
+	 */
+	async getActiveGameClient(params: GameClientStartParameterObject = {}): Promise<GameClient<EngineVersion>> {
+		if (this.params.playlog) {
+			throw new Error(
+				"GameContext#getActiveGameClient(): Cannot create an active client when playlog is provided. " +
+					"Use createPassiveGameClient() instead."
+			);
+		}
+
 		if (this.playId != null) {
 			await this.playManager.deletePlay(this.playId);
 		}
 
 		this.playId = await this.createPlay();
 
-		const executionMode = this.params.playlog ? "passive" : ("active" satisfies GameClientInstanceType);
-		const { runner, game } = await this.createRunner(params, executionMode);
+		const { runner, game } = await this.createRunner(params, "active");
 
-		return new GameClient<EngineVersion>({ runner, game, type: executionMode, renderingMode: params.renderingMode });
+		return new GameClient<EngineVersion>({ runner, game, type: "active", renderingMode: params.renderingMode });
 	}
 
 	/**

@@ -6,9 +6,24 @@ const gameJsonPath = path.resolve(__dirname, "fixtures", "helloworld", "game.jso
 const playlogPath = path.resolve(__dirname, "fixtures", "helloworld", "playlog.0.json");
 
 describe("run content", () => {
+	it("deprecated - getGameClient", async () => {
+		// playlog なし -> active を返す
+		const activeContext = new GameContext<3>({ gameJsonPath });
+		const activeClient = await activeContext.getGameClient();
+		expect(activeClient.type).toBe("active");
+		await activeContext.destroy();
+
+		// playlog あり -> passive を返す
+		const playlog = JSON.parse(await readFile(playlogPath, "utf8"));
+		const passiveContext = new GameContext<3>({ gameJsonPath, playlog });
+		const passiveClient = await passiveContext.getGameClient();
+		expect(passiveClient.type).toBe("passive");
+		await passiveContext.destroy();
+	});
+
 	it("empty content", async () => {
 		const context = new GameContext<3>({});
-		const activeClient = await context.getGameClient();
+		const activeClient = await context.getActiveGameClient();
 		const game = activeClient.game;
 		expect(game.width).toBe(1280);
 		expect(game.height).toBe(720);
@@ -17,7 +32,7 @@ describe("run content", () => {
 
 	it("create assets", async () => {
 		const context = new GameContext<3>({});
-		const activeClient = await context.getGameClient();
+		const activeClient = await context.getActiveGameClient();
 
 		const imageAsset = activeClient.createDummyImageAsset({
 			id: "dummy-image-asset-id",
@@ -68,7 +83,7 @@ describe("run content", () => {
 
 	it("helloworld", async () => {
 		const context = new GameContext<3>({ gameJsonPath });
-		const activeClient = await context.getGameClient({ gameArgs: "active" });
+		const activeClient = await context.getActiveGameClient({ gameArgs: "active" });
 
 		expect(activeClient.type).toBe("active");
 
@@ -117,7 +132,7 @@ describe("run content", () => {
 
 	it("send message event", async () => {
 		const context = new GameContext<3>({ gameJsonPath });
-		const activeClient = await context.getGameClient();
+		const activeClient = await context.getActiveGameClient();
 		const passiveClient = await context.createPassiveGameClient();
 
 		await activeClient.advanceUntil(() => activeClient.game.scene()!.name === "entry-scene");
@@ -144,7 +159,7 @@ describe("run content", () => {
 
 	it("send join/leave event", async () => {
 		const context = new GameContext<3>({ gameJsonPath });
-		const activeClient = await context.getGameClient();
+		const activeClient = await context.getActiveGameClient();
 		const passiveClient = await context.createPassiveGameClient();
 
 		await activeClient.advanceUntil(() => activeClient.game.scene()!.name === "entry-scene");
@@ -234,7 +249,7 @@ describe("run content", () => {
 	it("playlog replay", async () => {
 		const playlog = JSON.parse(await readFile(playlogPath, "utf8"));
 		const context = new GameContext<3>({ gameJsonPath, playlog });
-		const client = await context.getGameClient();
+		const client = await context.createPassiveGameClient();
 
 		// playlog が与えられているので passive モードになることを確認
 		expect(client.type).toBe("passive");
@@ -288,7 +303,7 @@ describe("run content", () => {
 		const consoleLogSpy = jest.spyOn(console, "log");
 
 		const context = new GameContext<3>({ gameJsonPath, verbose: false });
-		await context.getGameClient();
+		await context.getActiveGameClient();
 
 		// 一切のログが出力されていないことを確認
 		expect(consoleLogSpy).not.toHaveBeenCalled();
@@ -300,7 +315,7 @@ describe("run content", () => {
 		const consoleLogSpy = jest.spyOn(console, "log");
 
 		const context = new GameContext<3>({ gameJsonPath, verbose: true });
-		await context.getGameClient();
+		await context.getActiveGameClient();
 
 		expect(consoleLogSpy).toHaveBeenCalled();
 
@@ -313,7 +328,7 @@ describe("raise-event", () => {
 		const context = new GameContext({
 			gameJsonPath: path.join(__dirname, "fixtures", "raise-event", "game.json")
 		});
-		const activeClient = await context.getGameClient();
+		const activeClient = await context.getActiveGameClient();
 
 		const makeMessageEvent = (time: number): [number, any] => [time, { message: `time: ${time}` }];
 

@@ -30,7 +30,7 @@ import { GameContext } from "@akashic/headless-akashic";
   const context = new GameContext({
     gameJsonPath: path.join(__dirname, "..", "helloworld", "game.json") // テストする game.json のパス
   });
-  const client = await context.getGameClient();
+  const client = await context.getActiveGameClient();
 
   const game = client.game;
   assert.strictEqual(game.width, 800);
@@ -66,6 +66,30 @@ import { GameContext } from "@akashic/headless-akashic";
 
 ## note
 
+### playlog の再生
+
+`GameContext` の生成時に `playlog` を渡すと playlog を再生できます。
+playlog を渡した場合 `getActiveGameClient()` はエラーになります。代わりに `createPassiveGameClient()` を利用してください。
+
+```javascript
+import { readFile } from "node:fs/promises";
+import { GameContext } from "@akashic/headless-akashic";
+
+(async () => {
+  const playlog = JSON.parse(await readFile("playlog.json", "utf8"));
+  const context = new GameContext({
+    gameJsonPath: "game.json",
+    playlog
+  });
+  const client = await context.createPassiveGameClient();
+
+  // playlog の最後まで一気に進める
+  await client.advanceLatest();
+
+  // ...
+})();
+```
+
 ### コンテンツの描画内容の取得
 
 akashic-engine@3.0.0 以降に対応したコンテンツであれば `GameClient#getPrimarySurfaceCanvas()` を利用して描画内容を取得できます。
@@ -93,7 +117,7 @@ import { writeFileSync } from "node:fs";
 
 // ...
 
-const client = await context.getGameClient({ renderingMode: "canvas" }); // renderingMode を指定
+const client = await context.getActiveGameClient({ renderingMode: "canvas" }); // renderingMode を指定
 const canvas = client.getPrimarySurfaceCanvas();
 writeFileSync("output.png", canvas.toBuffer("image/png")); // "output.png" に描画内容を書き出し
 ```
@@ -122,7 +146,7 @@ headless-akashic はコンテンツのバージョンを動的に読み込むた
 // ...
 
 const context = new GameContext<3>({ gameJsonPath }); // generics による型の指定 (v3 の場合)
-const client = await context.getGameClient();
+const client = await context.getActiveGameClient();
 
 const game = client.game!;
 await client.advanceUntil(() => client.game.scene().name === "entry-scene");
@@ -140,7 +164,7 @@ import type { Canvas } from "@napi-rs/canvas";
 // ...
 
 const context = new GameContext({ gameJsonPath });
-const client = await context.getGameClient();
+const client = await context.getActiveGameClient();
 const game = client.game as RunnerV3Game;
 
 // ...
@@ -180,7 +204,7 @@ import { GameContext } from "@akashic/headless-akashic";
 
 // ...
 
-const client = await context.getGameClient();
+const client = await context.getActiveGameClient();
 
 // ...
 
@@ -205,7 +229,7 @@ globalThis.g = g;
 
 ...
 
-const client = await context.getGameClient();
+const client = await context.getActiveGameClient();
 const game = client.game;
 
 globalThis.g.game = game;
