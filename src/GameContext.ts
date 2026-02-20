@@ -1,6 +1,7 @@
 import type { DumpedPlaylog, RunnerPlayer, RunnerRenderingMode } from "@akashic/headless-driver";
 import { PlayManager, RunnerManager, setSystemLogger } from "@akashic/headless-driver";
 import { activePermission, EMPTY_V3_PATH, passivePermission } from "./constants";
+import type { GameClientInstanceType } from "./GameClient";
 import { GameClient } from "./GameClient";
 import { DefaultLogger } from "./loggers/DefaultLogger";
 import { VerboseLogger } from "./loggers/VerboseLogger";
@@ -73,44 +74,35 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	}
 
 	/**
-	 * active の GameClient を返す。
+	 * プレイを初期化したうえで GameClient を返す。
+	 * playlog が与えられていたら passive の、そうでなければ active の GameClient を返す。
+	 * @deprecated 代わりに getActiveGameClient() または createPassiveGameClient() を利用すること
 	 */
 	async getGameClient(params: GameClientStartParameterObject = {}): Promise<GameClient<EngineVersion>> {
-		const { playManager, runnerManager } = this;
-		const { gameJsonPath } = this.params;
+		if (this.params.playlog) {
+			return this.createPassiveGameClient(params);
+		}
+		return this.getActiveGameClient(params);
+	}
+
+	/**
+	 * プレイを初期化したうえで active の GameClient を返す。
+	 */
+	async getActiveGameClient(params: GameClientStartParameterObject = {}): Promise<GameClient<EngineVersion>> {
+		if (this.params.playlog) {
+			throw new Error(
+				"GameContext#getActiveGameClient(): Cannot create an active client when playlog is provided. " +
+					"Use createPassiveGameClient() instead."
+			);
+		}
 
 		if (this.playId != null) {
 			await this.playManager.deletePlay(this.playId);
 		}
 
-		const playId = await playManager.createPlay(
-			{
-				gameJsonPath: gameJsonPath ?? EMPTY_V3_PATH
-			},
-			this.params.playlog
-		);
-		this.playId = playId;
+		this.playId = await this.createPlay();
 
-		const playToken = playManager.createPlayToken(playId, activePermission);
-		const amflow = playManager.createAMFlow(playId);
-
-		const runnerId = await runnerManager.createRunner({
-			playId,
-			amflow,
-			playToken,
-			player: params.player,
-			executionMode: "active",
-			allowedUrls: null,
-			trusted: true,
-			renderingMode: params.renderingMode,
-			externalValue: params.externalValue,
-			gameArgs: params.gameArgs
-		});
-
-		const runner = runnerManager.getRunner(runnerId)!;
-		runner.errorTrigger.add(this.handleRunnerError, this);
-		const game = (await runnerManager.startRunner(runnerId)) as EngineVersions[EngineVersion]["game"];
-		runner.pause();
+		const { runner, game } = await this.createRunner(params, "active");
 
 		return new GameClient<EngineVersion>({ runner, game, type: "active", renderingMode: params.renderingMode });
 	}
@@ -119,32 +111,11 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	 * passive の GameClient を生成する。
 	 */
 	async createPassiveGameClient(params: GameClientStartParameterObject = {}): Promise<GameClient<EngineVersion>> {
-		const { playManager, runnerManager, playId } = this;
-
-		if (playId == null) {
-			throw new Error("Cannot create the client before starting");
+		if (this.playId == null) {
+			this.playId = await this.createPlay();
 		}
 
-		const playToken = playManager.createPlayToken(playId, passivePermission);
-		const amflow = playManager.createAMFlow(playId);
-
-		const runnerId = await runnerManager.createRunner({
-			playId,
-			amflow,
-			playToken,
-			player: params.player,
-			executionMode: "passive",
-			allowedUrls: null,
-			trusted: true,
-			renderingMode: params.renderingMode,
-			externalValue: params.externalValue,
-			gameArgs: params.gameArgs
-		});
-
-		const runner = runnerManager.getRunner(runnerId)!;
-		const game = (await runnerManager.startRunner(runnerId)) as EngineVersions[EngineVersion]["game"];
-		runner.errorTrigger.add(this.handleRunnerError, this);
-		runner.pause();
+		const { runner, game } = await this.createRunner(params, "passive");
 
 		return new GameClient<EngineVersion>({ runner, game, type: "passive", renderingMode: params.renderingMode });
 	}
@@ -212,6 +183,49 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 		const { runnerManager } = this;
 		const runners = runnerManager.getRunners();
 		await Promise.allSettled(runners.map(runner => runner.step()));
+	}
+
+	// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+	protected async createRunner(params: GameClientStartParameterObject, executionMode: GameClientInstanceType) {
+		const { playManager, runnerManager } = this;
+		let { playId } = this;
+
+		if (playId == null) {
+			playId = await this.createPlay();
+		}
+
+		const permission = executionMode === "active" ? activePermission : passivePermission;
+		const playToken = playManager.createPlayToken(playId, permission);
+		const amflow = playManager.createAMFlow(playId);
+
+		const runnerId = await runnerManager.createRunner({
+			playId,
+			amflow,
+			playToken,
+			player: params.player,
+			executionMode,
+			allowedUrls: null,
+			trusted: true,
+			renderingMode: params.renderingMode,
+			externalValue: params.externalValue,
+			gameArgs: params.gameArgs
+		});
+
+		const runner = runnerManager.getRunner(runnerId)!;
+		const game = (await runnerManager.startRunner(runnerId)) as EngineVersions[EngineVersion]["game"];
+		runner.errorTrigger.add(this.handleRunnerError, this);
+		runner.pause();
+
+		return { runner, game };
+	}
+
+	protected async createPlay(): Promise<string> {
+		return this.playManager.createPlay(
+			{
+				gameJsonPath: this.params.gameJsonPath ?? EMPTY_V3_PATH
+			},
+			this.params.playlog
+		);
 	}
 
 	protected handleRunnerError(err: any): void {

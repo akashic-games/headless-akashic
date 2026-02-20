@@ -8,10 +8,10 @@
     "build": "rimraf ./lib && npm run format && tsc",
     "format": "run-s format:*",
     "format:prettier": "prettier --write \"src/**/*.ts\"",
-    "format:eslint": "eslint src/**/*.ts --fix",
+    "format:eslint": "eslint \"src/**/*.ts\" --fix",
     "test": "run-s test:*",
     "test:jest": "jest",
-    "test:eslint": "eslint src/**/*.ts",
+    "test:eslint": "eslint \"src/**/*.ts\"",
     "test:remark": "remark ./*.md --frail --no-stdout --quiet"
   },
   "author": "DWANGO Co., Ltd.",

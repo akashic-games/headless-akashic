@@ -1,12 +1,29 @@
+import { readFile } from "fs/promises";
 import * as path from "path";
 import { GameContext } from "..";
 
 const gameJsonPath = path.resolve(__dirname, "fixtures", "helloworld", "game.json");
+const playlogPath = path.resolve(__dirname, "fixtures", "helloworld", "playlog.0.json");
 
 describe("run content", () => {
+	it("deprecated - getGameClient", async () => {
+		// playlog なし -> active を返す
+		const activeContext = new GameContext<3>({ gameJsonPath });
+		const activeClient = await activeContext.getGameClient();
+		expect(activeClient.type).toBe("active");
+		await activeContext.destroy();
+
+		// playlog あり -> passive を返す
+		const playlog = JSON.parse(await readFile(playlogPath, "utf8"));
+		const passiveContext = new GameContext<3>({ gameJsonPath, playlog });
+		const passiveClient = await passiveContext.getGameClient();
+		expect(passiveClient.type).toBe("passive");
+		await passiveContext.destroy();
+	});
+
 	it("empty content", async () => {
 		const context = new GameContext<3>({});
-		const activeClient = await context.getGameClient();
+		const activeClient = await context.getActiveGameClient();
 		const game = activeClient.game;
 		expect(game.width).toBe(1280);
 		expect(game.height).toBe(720);
@@ -15,7 +32,7 @@ describe("run content", () => {
 
 	it("create assets", async () => {
 		const context = new GameContext<3>({});
-		const activeClient = await context.getGameClient();
+		const activeClient = await context.getActiveGameClient();
 
 		const imageAsset = activeClient.createDummyImageAsset({
 			id: "dummy-image-asset-id",
@@ -66,7 +83,7 @@ describe("run content", () => {
 
 	it("helloworld", async () => {
 		const context = new GameContext<3>({ gameJsonPath });
-		const activeClient = await context.getGameClient({ gameArgs: "active" });
+		const activeClient = await context.getActiveGameClient({ gameArgs: "active" });
 
 		expect(activeClient.type).toBe("active");
 
@@ -115,7 +132,7 @@ describe("run content", () => {
 
 	it("send message event", async () => {
 		const context = new GameContext<3>({ gameJsonPath });
-		const activeClient = await context.getGameClient();
+		const activeClient = await context.getActiveGameClient();
 		const passiveClient = await context.createPassiveGameClient();
 
 		await activeClient.advanceUntil(() => activeClient.game.scene()!.name === "entry-scene");
@@ -142,7 +159,7 @@ describe("run content", () => {
 
 	it("send join/leave event", async () => {
 		const context = new GameContext<3>({ gameJsonPath });
-		const activeClient = await context.getGameClient();
+		const activeClient = await context.getActiveGameClient();
 		const passiveClient = await context.createPassiveGameClient();
 
 		await activeClient.advanceUntil(() => activeClient.game.scene()!.name === "entry-scene");
@@ -229,11 +246,64 @@ describe("run content", () => {
 		await context.destroy();
 	});
 
+	it("playlog replay", async () => {
+		const playlog = JSON.parse(await readFile(playlogPath, "utf8"));
+		const context = new GameContext<3>({ gameJsonPath, playlog });
+		const client = await context.createPassiveGameClient();
+
+		// playlog が与えられているので passive モードになることを確認
+		expect(client.type).toBe("passive");
+
+		const game = client.game!;
+		expect(game).toBeInstanceOf(client.g.Game);
+		expect(game.isActiveInstance()).toBe(false);
+		expect(game.width).toBe(800);
+		expect(game.height).toBe(450);
+		expect(game.fps).toBe(60);
+
+		await client.advanceUntil(() => game.scene()!.name === "entry-scene");
+
+		expect(game.age).toBe(0);
+
+		const scene = game.scene()!;
+		expect(scene).toBeInstanceOf(client.g.Scene);
+		expect(scene).toBeDefined();
+		expect(Object.keys(scene.assets).length).toBe(4); // player, shot, se, dummy_text
+		expect(scene.children.length).toBe(1); // player のみ
+
+		// advanceLatest() を使って playlog の最後まで進めることを確認
+		await client.advanceLatest();
+
+		expect(game.age).toBe(166); // 165 + 1
+
+		const player = scene.children.find(child => child.tag === "player");
+		expect(player!.x).toBe(384);
+		expect(player!.y).toBeCloseTo(205, 0); // 小数点以下を無視して整数で比較
+
+		// 各 shot の個数と位置を確認
+		const shots = scene.children.filter(child => child.tag === "shot");
+		expect(shots.length).toBe(6);
+		expect(shots[0].x).toBeCloseTo(758, 0); // 小数点以下を無視して整数で比較
+		expect(shots[0].y).toBeCloseTo(211, 0);
+		expect(shots[1].x).toBeCloseTo(710, 0);
+		expect(shots[1].y).toBeCloseTo(200, 0);
+		expect(shots[2].x).toBeCloseTo(671, 0);
+		expect(shots[2].y).toBeCloseTo(218, 0);
+		expect(shots[3].x).toBeCloseTo(635, 0);
+		expect(shots[3].y).toBeCloseTo(201, 0);
+		expect(shots[4].x).toBeCloseTo(608, 0);
+		expect(shots[4].y).toBeCloseTo(210, 0);
+		expect(shots[5].x).toBeCloseTo(572, 0);
+		expect(shots[5].y).toBeCloseTo(209, 0);
+
+		await context.destroy();
+	});
+
 	it("verbose = false", async () => {
 		const consoleLogSpy = jest.spyOn(console, "log");
 
 		const context = new GameContext<3>({ gameJsonPath, verbose: false });
-		await context.getGameClient();
+		await context.getActiveGameClient();
 
 		// 一切のログが出力されていないことを確認
 		expect(consoleLogSpy).not.toHaveBeenCalled();
@@ -245,7 +315,7 @@ describe("run content", () => {
 		const consoleLogSpy = jest.spyOn(console, "log");
 
 		const context = new GameContext<3>({ gameJsonPath, verbose: true });
-		await context.getGameClient();
+		await context.getActiveGameClient();
 
 		expect(consoleLogSpy).toHaveBeenCalled();
 
@@ -258,7 +328,7 @@ describe("raise-event", () => {
 		const context = new GameContext({
 			gameJsonPath: path.join(__dirname, "fixtures", "raise-event", "game.json")
 		});
-		const activeClient = await context.getGameClient();
+		const activeClient = await context.getActiveGameClient();
 
 		const makeMessageEvent = (time: number): [number, any] => [time, { message: `time: ${time}` }];
 

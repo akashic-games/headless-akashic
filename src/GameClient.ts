@@ -236,7 +236,7 @@ export class GameClient<EngineVersion extends keyof EngineVersions = keyof Engin
 	 */
 	async advanceLatest(timeout: number = 5000): Promise<void> {
 		if (this.type !== "passive") {
-			throw Error("GameClient#advanceLatest(): This method is only available for passive instances");
+			throw Error("GameClient#advanceLatest(): This method is only available for passive clients");
 		}
 		return this.runner.advanceLatest(timeout);
 	}
