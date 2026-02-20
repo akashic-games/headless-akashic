@@ -83,8 +83,8 @@ import { GameContext } from "@akashic/headless-akashic";
   });
   const client = await context.createPassiveGameClient();
 
-  // playlog の最後まで一気に進める
-  await client.advanceLatest();
+  // playlog を再生する
+  await client.advance(...);
 
   // ...
 })();
