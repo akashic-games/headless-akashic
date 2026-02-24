@@ -96,11 +96,9 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 			);
 		}
 
-		if (this.playId != null) {
-			await this.playManager.deletePlay(this.playId);
+		if (this.playId == null) {
+			this.playId = await this.createPlay();
 		}
-
-		this.playId = await this.createPlay();
 
 		const { runner, game } = await this.createRunner(params, "active");
 
