@@ -82,6 +82,9 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 		if (this.params.playlog) {
 			return this.createPassiveGameClient(params);
 		}
+		if (this.playId != null) {
+			await this.playManager.deletePlay(this.playId);
+		}
 		return this.getActiveGameClient(params);
 	}
 
