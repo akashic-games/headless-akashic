@@ -86,7 +86,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	}
 
 	/**
-	 * プレイを初期化したうえで active の GameClient を返す。
+	 * active の GameClient を返す。
 	 */
 	async getActiveGameClient(params: GameClientStartParameterObject = {}): Promise<GameClient<EngineVersion>> {
 		if (this.params.playlog) {
