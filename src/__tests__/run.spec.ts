@@ -23,7 +23,7 @@ describe("run content", () => {
 
 	it("empty content", async () => {
 		const context = new GameContext<3>({});
-		const activeClient = await context.getActiveGameClient();
+		const activeClient = await context.createActiveGameClient();
 		const game = activeClient.game;
 		expect(game.width).toBe(1280);
 		expect(game.height).toBe(720);
@@ -32,7 +32,7 @@ describe("run content", () => {
 
 	it("create assets", async () => {
 		const context = new GameContext<3>({});
-		const activeClient = await context.getActiveGameClient();
+		const activeClient = await context.createActiveGameClient();
 
 		const imageAsset = activeClient.createDummyImageAsset({
 			id: "dummy-image-asset-id",
@@ -83,7 +83,7 @@ describe("run content", () => {
 
 	it("helloworld", async () => {
 		const context = new GameContext<3>({ gameJsonPath });
-		const activeClient = await context.getActiveGameClient({ gameArgs: "active" });
+		const activeClient = await context.createActiveGameClient({ gameArgs: "active" });
 
 		expect(activeClient.type).toBe("active");
 
@@ -132,7 +132,7 @@ describe("run content", () => {
 
 	it("send message event", async () => {
 		const context = new GameContext<3>({ gameJsonPath });
-		const activeClient = await context.getActiveGameClient();
+		const activeClient = await context.createActiveGameClient();
 		const passiveClient = await context.createPassiveGameClient();
 
 		await activeClient.advanceUntil(() => activeClient.game.scene()!.name === "entry-scene");
@@ -159,7 +159,7 @@ describe("run content", () => {
 
 	it("send join/leave event", async () => {
 		const context = new GameContext<3>({ gameJsonPath });
-		const activeClient = await context.getActiveGameClient();
+		const activeClient = await context.createActiveGameClient();
 		const passiveClient = await context.createPassiveGameClient();
 
 		await activeClient.advanceUntil(() => activeClient.game.scene()!.name === "entry-scene");
@@ -303,7 +303,7 @@ describe("run content", () => {
 		const consoleLogSpy = jest.spyOn(console, "log");
 
 		const context = new GameContext<3>({ gameJsonPath, verbose: false });
-		await context.getActiveGameClient();
+		await context.createActiveGameClient();
 
 		// 一切のログが出力されていないことを確認
 		expect(consoleLogSpy).not.toHaveBeenCalled();
@@ -315,7 +315,7 @@ describe("run content", () => {
 		const consoleLogSpy = jest.spyOn(console, "log");
 
 		const context = new GameContext<3>({ gameJsonPath, verbose: true });
-		await context.getActiveGameClient();
+		await context.createActiveGameClient();
 
 		expect(consoleLogSpy).toHaveBeenCalled();
 
@@ -328,7 +328,7 @@ describe("raise-event", () => {
 		const context = new GameContext({
 			gameJsonPath: path.join(__dirname, "fixtures", "raise-event", "game.json")
 		});
-		const activeClient = await context.getActiveGameClient();
+		const activeClient = await context.createActiveGameClient();
 
 		const makeMessageEvent = (time: number): [number, any] => [time, { message: `time: ${time}` }];
 

@@ -76,7 +76,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 	/**
 	 * プレイを初期化したうえで GameClient を返す。
 	 * playlog が与えられていたら passive の、そうでなければ active の GameClient を返す。
-	 * @deprecated 代わりに getActiveGameClient() または createPassiveGameClient() を利用すること
+	 * @deprecated 代わりに createActiveGameClient() または createPassiveGameClient() を利用すること
 	 */
 	async getGameClient(params: GameClientStartParameterObject = {}): Promise<GameClient<EngineVersion>> {
 		if (this.params.playlog) {
@@ -85,16 +85,17 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 		if (this.playId != null) {
 			await this.playManager.deletePlay(this.playId);
 		}
-		return this.getActiveGameClient(params);
+		return this.createActiveGameClient(params);
 	}
 
 	/**
-	 * active の GameClient を返す。
+	 * active の GameClient を生成する。
+	 * 本メソッドは基本的に一つの GameContext に対して一度だけ呼ばれるべきである。
 	 */
-	async getActiveGameClient(params: GameClientStartParameterObject = {}): Promise<GameClient<EngineVersion>> {
+	async createActiveGameClient(params: GameClientStartParameterObject = {}): Promise<GameClient<EngineVersion>> {
 		if (this.params.playlog) {
 			throw new Error(
-				"GameContext#getActiveGameClient(): Cannot create an active client when playlog is provided. " +
+				"GameContext#createActiveGameClient(): Cannot create an active client when playlog is provided. " +
 					"Use createPassiveGameClient() instead."
 			);
 		}
