@@ -195,6 +195,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 
 		if (playId == null) {
 			playId = await this.createPlay();
+			this.playId = playId;
 		}
 
 		const permission = executionMode === "active" ? activePermission : passivePermission;
