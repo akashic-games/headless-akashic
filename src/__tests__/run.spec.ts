@@ -11,6 +11,12 @@ describe("run content", () => {
 		const activeContext = new GameContext<3>({ gameJsonPath });
 		const activeClient = await activeContext.getGameClient();
 		expect(activeClient.type).toBe("active");
+
+		// 複数回呼び出すと play が作り直される
+		const previousPlayId = (activeContext as any).playId as string;
+		await activeContext.getGameClient();
+		expect((activeContext as any).playId).not.toBe(previousPlayId);
+
 		await activeContext.destroy();
 
 		// playlog あり -> passive を返す

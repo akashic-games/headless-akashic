@@ -84,6 +84,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 		}
 		if (this.playId != null) {
 			await this.playManager.deletePlay(this.playId);
+			this.playId = null;
 		}
 		return this.createActiveGameClient(params);
 	}
