@@ -86,6 +86,9 @@ import { GameContext } from "@akashic/headless-akashic";
   // playlog を再生する
   await client.advance(...);
 
+  // または終端まで再生する
+  await client.advanceLatest();
+
   // ...
 })();
 ```
