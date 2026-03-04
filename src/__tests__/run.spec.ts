@@ -252,59 +252,6 @@ describe("run content", () => {
 		await context.destroy();
 	});
 
-	it("playlog replay", async () => {
-		const playlog = JSON.parse(await readFile(playlogPath, "utf8"));
-		const context = new GameContext<3>({ gameJsonPath, playlog });
-		const client = await context.createPassiveGameClient();
-
-		// playlog が与えられているので passive モードになることを確認
-		expect(client.type).toBe("passive");
-
-		const game = client.game!;
-		expect(game).toBeInstanceOf(client.g.Game);
-		expect(game.isActiveInstance()).toBe(false);
-		expect(game.width).toBe(800);
-		expect(game.height).toBe(450);
-		expect(game.fps).toBe(60);
-
-		await client.advanceUntil(() => game.scene()!.name === "entry-scene");
-
-		expect(game.age).toBe(0);
-
-		const scene = game.scene()!;
-		expect(scene).toBeInstanceOf(client.g.Scene);
-		expect(scene).toBeDefined();
-		expect(Object.keys(scene.assets).length).toBe(4); // player, shot, se, dummy_text
-		expect(scene.children.length).toBe(1); // player のみ
-
-		// advanceLatest() を使って playlog の最後まで進めることを確認
-		await client.advanceLatest();
-
-		expect(game.age).toBe(166); // 165 + 1
-
-		const player = scene.children.find(child => child.tag === "player");
-		expect(player!.x).toBe(384);
-		expect(player!.y).toBeCloseTo(205, 0); // 小数点以下を無視して整数で比較
-
-		// 各 shot の個数と位置を確認
-		const shots = scene.children.filter(child => child.tag === "shot");
-		expect(shots.length).toBe(6);
-		expect(shots[0].x).toBeCloseTo(758, 0); // 小数点以下を無視して整数で比較
-		expect(shots[0].y).toBeCloseTo(211, 0);
-		expect(shots[1].x).toBeCloseTo(710, 0);
-		expect(shots[1].y).toBeCloseTo(200, 0);
-		expect(shots[2].x).toBeCloseTo(671, 0);
-		expect(shots[2].y).toBeCloseTo(218, 0);
-		expect(shots[3].x).toBeCloseTo(635, 0);
-		expect(shots[3].y).toBeCloseTo(201, 0);
-		expect(shots[4].x).toBeCloseTo(608, 0);
-		expect(shots[4].y).toBeCloseTo(210, 0);
-		expect(shots[5].x).toBeCloseTo(572, 0);
-		expect(shots[5].y).toBeCloseTo(209, 0);
-
-		await context.destroy();
-	});
-
 	it("verbose = false", async () => {
 		const consoleLogSpy = jest.spyOn(console, "log");
 
@@ -444,6 +391,118 @@ describe("raise-event", () => {
 				}
 			}
 		]);
+
+		await context.destroy();
+	});
+});
+
+describe("replay", () => {
+	// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+	const createReplayContext = async () => {
+		const playlog = JSON.parse(await readFile(playlogPath, "utf8"));
+		const context = new GameContext<3>({ gameJsonPath, playlog });
+		const client = await context.createPassiveGameClient();
+		return { context, client };
+	};
+
+	it("instantiate", async () => {
+		const { client } = await createReplayContext();
+
+		// playlog が与えられているので passive モードになることを確認
+		expect(client.type).toBe("passive");
+
+		const game = client.game!;
+		expect(game).toBeInstanceOf(client.g.Game);
+		expect(game.isActiveInstance()).toBe(false);
+		expect(game.width).toBe(800);
+		expect(game.height).toBe(450);
+		expect(game.fps).toBe(60);
+
+		await client.advanceUntil(() => game.scene()!.name === "entry-scene");
+		expect(game.age).toBe(0);
+
+		const scene = game.scene()!;
+		expect(scene).toBeInstanceOf(client.g.Scene);
+		expect(scene).toBeDefined();
+		expect(Object.keys(scene.assets).length).toBe(4); // player, shot, se, dummy_text
+		expect(scene.children.length).toBe(1); // player のみ
+	});
+
+	it("playlog replay - advanceLatest()", async () => {
+		const { context, client } = await createReplayContext();
+
+		const game = client.game!;
+		await client.advanceUntil(() => game.scene()!.name === "entry-scene");
+
+		const scene = game.scene()!;
+
+		// playlog 終端の 165 フレームまで進める
+		await client.advanceLatest();
+
+		const shots = scene.children.filter(child => child.tag === "shot");
+		const player = scene.children.find(child => child.tag === "player")!;
+
+		expect(game.age).toBe(166); // 165 + 1
+		expect(player.x).toBe(384);
+		expect(player.y).toBeCloseTo(205, 0); // 小数点以下を無視して整数で比較
+
+		expect(shots.length).toBe(6);
+		expect(shots[0].x).toBeCloseTo(758, 0); // 小数点以下を無視して整数で比較
+		expect(shots[0].y).toBeCloseTo(211, 0);
+		expect(shots[1].x).toBeCloseTo(710, 0);
+		expect(shots[1].y).toBeCloseTo(200, 0);
+		expect(shots[2].x).toBeCloseTo(671, 0);
+		expect(shots[2].y).toBeCloseTo(218, 0);
+		expect(shots[3].x).toBeCloseTo(635, 0);
+		expect(shots[3].y).toBeCloseTo(201, 0);
+		expect(shots[4].x).toBeCloseTo(608, 0);
+		expect(shots[4].y).toBeCloseTo(210, 0);
+		expect(shots[5].x).toBeCloseTo(572, 0);
+		expect(shots[5].y).toBeCloseTo(209, 0);
+
+		await context.destroy();
+	});
+
+	it("playlog replay - advance()", async () => {
+		const { context, client } = await createReplayContext();
+
+		const game = client.game!;
+		await client.advanceUntil(() => game.scene()!.name === "entry-scene");
+
+		const scene = game.scene()!;
+		const frameMs = 1000 / game.fps;
+
+		// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+		const shots = () => scene.children.filter(child => child.tag === "shot");
+
+		// ゲームが開始されるまで進める
+		while (game.age === 0) {
+			await client.advance(frameMs);
+		}
+
+		// 1つ目の PointDown (frame 52)
+		await client.advance(frameMs * 53);
+		expect(shots().length).toBe(1);
+
+		// 2つ目の PointDown (frame 68)
+		await client.advance(frameMs * (69 - 53));
+		expect(shots().length).toBe(2);
+
+		// 3つ目の PointDown (frame 81)
+		await client.advance(frameMs * (82 - 69));
+		expect(shots().length).toBe(3);
+
+		// 4つ目の PointDown (frame 93)
+		await client.advance(frameMs * (94 - 82));
+		expect(shots().length).toBe(4);
+
+		// 5つ目の PointDown (frame 102)
+		await client.advance(frameMs * (103 - 94));
+		expect(shots().length).toBe(5);
+
+		// 6つ目の PointDown (frame 114)
+		await client.advance(frameMs * (115 - 103));
+		expect(shots().length).toBe(6);
 
 		await context.destroy();
 	});

@@ -19,4 +19,13 @@ export const passivePermission: Permission = {
 	maxEventPriority: 2
 };
 
+export const replayPermission: Permission = {
+	readTick: true,
+	writeTick: false,
+	sendEvent: false,
+	subscribeEvent: false,
+	subscribeTick: true,
+	maxEventPriority: 0
+};
+
 export const EMPTY_V3_PATH: string = path.join(__dirname, "..", "fixtures", "empty-v3", "game.json");

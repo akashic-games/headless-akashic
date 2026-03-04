@@ -1,6 +1,6 @@
 import type { DumpedPlaylog, RunnerPlayer, RunnerRenderingMode } from "@akashic/headless-driver";
 import { PlayManager, RunnerManager, setSystemLogger } from "@akashic/headless-driver";
-import { activePermission, EMPTY_V3_PATH, passivePermission } from "./constants";
+import { activePermission, EMPTY_V3_PATH, passivePermission, replayPermission } from "./constants";
 import type { GameClientInstanceType } from "./GameClient";
 import { GameClient } from "./GameClient";
 import { DefaultLogger } from "./loggers/DefaultLogger";
@@ -198,7 +198,9 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 			this.playId = playId;
 		}
 
-		const permission = executionMode === "active" ? activePermission : passivePermission;
+		const isReplay = executionMode === "passive" && !!this.params.playlog;
+		const permission = executionMode === "active" ? activePermission : isReplay ? replayPermission : passivePermission;
+		const loopMode = isReplay ? "replay" : "realtime";
 		const playToken = playManager.createPlayToken(playId, permission);
 		const amflow = playManager.createAMFlow(playId);
 
@@ -208,6 +210,7 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 			playToken,
 			player: params.player,
 			executionMode,
+			loopMode,
 			allowedUrls: null,
 			trusted: true,
 			renderingMode: params.renderingMode,
@@ -216,9 +219,8 @@ export class GameContext<EngineVersion extends keyof EngineVersions = keyof Engi
 		});
 
 		const runner = runnerManager.getRunner(runnerId)!;
-		const game = (await runnerManager.startRunner(runnerId)) as EngineVersions[EngineVersion]["game"];
+		const game = (await runnerManager.startRunner(runnerId, { paused: true })) as EngineVersions[EngineVersion]["game"];
 		runner.errorTrigger.add(this.handleRunnerError, this);
-		runner.pause();
 
 		return { runner, game };
 	}

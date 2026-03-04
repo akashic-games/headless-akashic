@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 4.9.0
+* playlog を与えると passive replay モードで動作するように
+* `GameContext#getActiveGameClient()` を追加
+* `GameClient#advance()` を追加
+* `GameContext#getGameClient()` を非推奨に
+
 ## 4.8.0
 * headless-driver@2.18.0 に追従
 * `GameContext#advanceLatest()` を追加
