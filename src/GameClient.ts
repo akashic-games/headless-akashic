@@ -221,6 +221,14 @@ export class GameClient<EngineVersion extends keyof EngineVersions = keyof Engin
 	}
 
 	/**
+	 * ゲームの状態を指定ミリ秒だけ進める。
+	 * @param ms 進めるミリ秒
+	 */
+	async advance(ms: number): Promise<void> {
+		return this.runner.advance(ms);
+	}
+
+	/**
 	 * 引数に指定した関数が真を返すまでゲームの状態を進める。
 	 * @param condition 進めるまでの条件となる関数。
 	 * @param timeout タイムアウトまでのミリ秒数。省略時は `5000` 。ゲーム内時間ではなく実時間である点に注意。
@@ -236,7 +244,7 @@ export class GameClient<EngineVersion extends keyof EngineVersions = keyof Engin
 	 */
 	async advanceLatest(timeout: number = 5000): Promise<void> {
 		if (this.type !== "passive") {
-			throw Error("GameClient#advanceLatest(): This method is only available for passive instances");
+			throw Error("GameClient#advanceLatest(): This method is only available for passive clients");
 		}
 		return this.runner.advanceLatest(timeout);
 	}

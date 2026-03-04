@@ -18,7 +18,8 @@ function main(param) {
             scene: scene,
             src: playerImageAsset,
             width: playerImageAsset.width,
-            height: playerImageAsset.height
+            height: playerImageAsset.height,
+            tag: "player",
         });
 
         // プレイヤーの初期座標を、画面の中心に設定します
@@ -41,7 +42,8 @@ function main(param) {
                 scene: scene,
                 src: shotImageAsset,
                 width: shotImageAsset.width,
-                height: shotImageAsset.height
+                height: shotImageAsset.height,
+                tag: "shot",
             });
 
             // 弾の初期座標を、プレイヤーの少し右に設定します
@@ -53,7 +55,7 @@ function main(param) {
                 if (shot.x > g.game.width)
                     shot.destroy();
                 // 弾を右に動かし、弾の動きを表現します
-                shot.x += 10;
+                shot.x += 3;
                 // 変更をゲームに通知します
                 shot.modified();
             });
