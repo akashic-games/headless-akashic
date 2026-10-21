@@ -88,6 +88,9 @@
   "publishConfig": {
     "@akashic:registry": "https://registry.npmjs.org/"
   },
+  "allowScripts": {
+    "unrs-resolver@1.11.1": true
+  },
   "devEngines": {
     "packageManager": {
       "name": "npm",
